@@ -63,3 +63,38 @@ void printBoard(Field *board)
 		printf("\n");
 	}
 }
+
+void onLoop()
+{
+	;
+}
+
+int onEvent(SDL_Event *event)
+{
+	if (event->type == SDL_KEYUP)
+		return 0;
+	return 1;
+}
+
+void onRender()
+{
+	;
+}
+
+SDL_Surface* loadBackground()
+{
+	SDL_Surface* tmp = IMG_Load("./images/board.png");
+	if (tmp == NULL)
+	{
+		printf("Load board file [%s] failed\n", "./images/board.png");
+		return NULL;
+	}
+	SDL_Surface* boardSurface = SDL_DisplayFormat(tmp);
+	if (boardSurface == NULL)
+	{
+		printf("SDL_DisplayFormat failed: %s\n", SDL_GetError());
+		return NULL;
+	}
+	return boardSurface;
+}
+

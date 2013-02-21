@@ -3,6 +3,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
 
 static unsigned int WIDTH = 8;
 static unsigned int HEIGHT = 8;
@@ -31,5 +33,14 @@ int isPermittedField(const Field field);
 int isFieldFree(const Field field); 
 
 void printBoard(Field *board);
+
+// ------- SDL routines ----
+
+void onLoop();
+int onEvent(SDL_Event *event);
+void onRender();
+SDL_Surface* loadBackground();
+
+//--------------------------
 
 #endif

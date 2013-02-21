@@ -1,5 +1,5 @@
 CC 			= gcc
-CFLAGS 		= -std=c99 -ggdb
+CFLAGS 		= -std=c99 -ggdb `pkg-config --cflags --libs sdl` -lSDL_image
 OBJS 		= *.o
 TARGET 		= otello
 CLEAN 		= rm -rf
