@@ -36,10 +36,14 @@ void printBoard(Field *board);
 
 // ------- SDL routines ----
 
-void onLoop();
 int onEvent(SDL_Event *event);
-void onRender();
+void onRender(const Field* board);
 SDL_Surface* loadBackground();
+SDL_Surface* loadBlack();
+SDL_Surface* loadWhite();
+
+void drawItem(SDL_Surface* srcSurf, SDL_Surface* destSurf, 
+		unsigned int X, unsigned int Y);
 
 //--------------------------
 
