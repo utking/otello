@@ -11,6 +11,8 @@ Field* createBoard()
 		for (int j = 0; j < WIDTH; ++j)
 		{
 			board[HEIGHT * i + j].owner = NONE;
+			board[HEIGHT * i + j].X = j;
+			board[HEIGHT * i + j].Y = i;
 		}
 	}
 	return board;
@@ -18,20 +20,55 @@ Field* createBoard()
 
 void destroyBoard(Field *board)
 {
-	free(board);
+	if (board)
+	{
+		free(board);
+		board = NULL;
+	}
 }
 
 int setField(Field* board, unsigned int X, unsigned int Y, Owner owner)
 {
-	if (!isPermittedField(board[HEIGHT * Y + X]))
-		return 0;
-	board[HEIGHT * Y + X].owner = owner;
-	return 1;
+	// Check if one of initial coins
+	int initial = (X == 3 && Y == 3) || (X == 4 && Y == 4)
+		|| (X == 3 && Y == 4) || (X == 4 && Y == 3);
+	// Put coin
+	if (initial || isPermittedField(board[HEIGHT * Y + X]))
+	{
+		board[HEIGHT * Y + X].owner = owner;
+		//	*********** find and flip others ***********
+		return 1;
+	}
+	return 0;
 }
 
 int isPermittedField(const Field field)
 {
-	return 1;
+	printf("NONE: %d\n", field.owner == NONE) && 
+		printf("neighbors: %d\n", hasNieghbors(field));
+	return (field.owner == NONE) && hasNieghbors(field);
+}
+
+int hasNieghbors(const Field field)
+{
+	unsigned int x = field.X;
+	unsigned int y = field.Y;
+	return
+		isGoorNeighbor(x - 1, y - 1) || // Top left
+		isGoorNeighbor(x - 0, y - 1) || // Top center
+		isGoorNeighbor(x + 1, y - 1) || // Top right
+		isGoorNeighbor(x - 1, y - 0) || // Middle left
+		isGoorNeighbor(x + 1, y - 0) || // Middle right
+		isGoorNeighbor(x - 1, y + 1) || // Bottom left
+		isGoorNeighbor(x - 0, y + 1) || // Bottom center
+		isGoorNeighbor(x + 1, y + 1);	// Bottom right
+}
+
+int isGoorNeighbor(const int x, const int y)
+{
+	if (x >= 0 && y >= 0 && board[y * 8 + x].owner == BLACK)
+		return 1;
+	return 0;
 }
 
 int isFieldFree(const Field field)
@@ -64,23 +101,65 @@ void printBoard(Field *board)
 	}
 }
 
-int onEvent(SDL_Event *event)
+int onEvent(SDL_Event *event, Field* board)
 {
 	if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_q)
 		return 0;
-	else if (event->type == SDL_MOUSEBUTTONDOWN)
+	if (event->type == SDL_QUIT)
+		return 0;
+
+	if (event->type == SDL_MOUSEBUTTONDOWN)
 	{
-		printf("%d / %d | %d / %d\n", 
-				event->button.x, event->button.y,
-				event->button.x / 80, event->button.y / 80
-				);
+		Field field;
+		field.X = event->button.x / 80;
+		field.Y = event->button.y / 80;
+		field = board[event->button.y / 80 * HEIGHT + event->button.x / 80];
+		printf("X:%d Y:%d Owner:%d\n", field.X, field.Y, field.owner);
+
+		if (isPermittedField(field))
+		{
+			setField(board, field.X, field.Y, WHITE);
+		}
 	}
 	return 1;
 }
 
 void onRender(const Field* board)
 {
-	return;
+	if (!whiteSurface || !blackSurface || !SurfDisplay)
+	{
+		printf("onRender: %s\n", "on of a surfaces is NULL");
+		return;
+	}
+
+	if (board)
+	{
+		SDL_Surface* surf = NULL;
+
+		SDL_Rect destRect;
+
+		SDL_BlitSurface(boardSurface, NULL, SurfDisplay, &destRect);
+		for (int i = 0; i < HEIGHT; ++i)
+		{
+			for (int j = 0; j < WIDTH; ++j)
+			{
+				switch (board[8 * i + j].owner)
+				{
+					case WHITE:
+						surf = whiteSurface;
+						break;
+					case BLACK:
+						surf = blackSurface;
+						break;
+					default:
+						surf = NULL;
+						break;
+				}
+				drawItem(surf, SurfDisplay, j, i);
+			}
+		}
+		SDL_Flip(SurfDisplay);
+	}
 }
 
 SDL_Surface* loadBackground()

@@ -9,6 +9,11 @@
 static unsigned int WIDTH = 8;
 static unsigned int HEIGHT = 8;
 
+SDL_Surface* blackSurface;
+SDL_Surface* whiteSurface;
+SDL_Surface* SurfDisplay;
+SDL_Surface* boardSurface;
+
 typedef enum OWNER { 
 	NONE = 0, 
 	BLACK = 101, 
@@ -19,6 +24,8 @@ typedef struct Field {
 	unsigned int X, Y;
 	char owner;
 } Field;
+
+Field* board;
 
 Field* createBoard();
 
@@ -34,9 +41,12 @@ int isFieldFree(const Field field);
 
 void printBoard(Field *board);
 
+int hasNieghbors(const Field field);
+int isGoorNeighbor(const int x, const int y);
+
 // ------- SDL routines ----
 
-int onEvent(SDL_Event *event);
+int onEvent(SDL_Event *event, Field* board);
 void onRender(const Field* board);
 SDL_Surface* loadBackground();
 SDL_Surface* loadBlack();
