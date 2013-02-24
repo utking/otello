@@ -6,9 +6,17 @@
 #include <string.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+#include <SDL/SDL_ttf.h>
+
+static unsigned int WND_WIDTH  = 890;
+static unsigned int WND_HEIGHT = 640;
 
 static unsigned int WIDTH = 8;
 static unsigned int HEIGHT = 8;
+static unsigned int FIELD_WIDTH = 80;
+
+static char whiteScoreText[16];
+static char blackScoreText[16];
 
 SDL_Surface* blackSurface;
 SDL_Surface* whiteSurface;
@@ -16,13 +24,28 @@ SDL_Surface* SurfDisplay;
 SDL_Surface* boardSurface;
 SDL_Surface* textSurface;
 
+SDL_Surface* scoreSurface;
+SDL_Surface* whiteScoreSurface;
+SDL_Surface* blackScoreSurface;
+
+// Score font and text
+TTF_Font *font;
+static SDL_Color fontColor = {20, 20, 20, 0};
+static SDL_Rect textDestRect   = {670, 100, 210,  44};
+static SDL_Rect whiteScoreRect = {670, 130, 210,  44};
+static SDL_Rect blackScoreRect = {670, 160, 210,  44};
+
+// Game over rect
+static SDL_Rect gameOverSrcRect  = {  0,   0, 210,  35};
+static SDL_Rect gameOverDestRect = {660,  40, 210,  35};
+
 // Exit button rect
 static SDL_Rect exitSrcRect  = {  0, 108, 210,  44};
-static SDL_Rect exitDestRect = {660, 346, 210,  44};
+static SDL_Rect exitDestRect = {660, 246, 210,  44};
 
 // New game button rect
 static SDL_Rect newSrcRect   = {  0, 152, 210,  44};
-static SDL_Rect newDestRect  = {660, 300, 210,  44};
+static SDL_Rect newDestRect  = {660, 200, 210,  44};
 
 // CS50 text rect
 static SDL_Rect cs50SrcRect  = { 10,  70, 180,  38};
@@ -43,7 +66,7 @@ Field* board;
 Field* prevBoard;
 Owner currentOwner;
 Owner prevOwner;
-
+SDL_Event event;
 
 Field* createBoard();
 
@@ -62,8 +85,6 @@ int isPermittedField(const Field field);
 
 int isFieldFree(const Field field); 
 
-void printBoard(Field *board);
-
 int hasNieghbors(const Field field);
 int isGoorNeighbor(const int x, const int y);
 int hasNextMove(Owner owner);
@@ -76,8 +97,13 @@ Field findNextMove();
 
 void restoreState();
 void saveState();
+void setInitialFields();
+void newGame();
 
 int isInRect(int x, int y, SDL_Rect rect);
+
+void cleanup();
+TTF_Font* makeFont(const char* fileName, const unsigned int size);
 
 // ------- SDL routines ----
 

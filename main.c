@@ -1,11 +1,30 @@
 #include "otello.h"
 #include <unistd.h>
 
-void cleanup();
-
 int main(int argc, char *argv[])
 {
 	int running = 1;
+	blackSurface = NULL;
+	whiteSurface = NULL;
+	SurfDisplay = NULL;
+	boardSurface = NULL;
+	textSurface = NULL;
+
+	font = NULL;
+
+	if(TTF_Init()==-1)
+	{
+		printf("TTF_Init: %s\n", TTF_GetError());
+		exit(2);
+	}
+
+	font = makeFont("./fonts/arial.ttf", 28);
+	if(!font)
+		exit(2);
+
+	scoreSurface = TTF_RenderText_Solid(font, "Score:", fontColor);
+	TTF_CloseFont(font);
+	font = makeFont("./fonts/arial.ttf", 22);
 
 	atexit(cleanup);
 
@@ -23,7 +42,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	SurfDisplay = SDL_SetVideoMode(
-			890, 640, 32,
+			WND_WIDTH, WND_HEIGHT, 32, SDL_FULLSCREEN | 
 			SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_HWACCEL);
 
 	SDL_WM_SetCaption("Otello", "Game");
@@ -44,16 +63,8 @@ int main(int argc, char *argv[])
 		value = SDL_MapRGB(textSurface->format, 0, 0, 255);
 		SDL_SetColorKey(textSurface, SDL_SRCCOLORKEY, value);
 
-		// Draw initial state
-		putField(board, 3, 3, WHITE);
-		putField(board, 4, 4, WHITE);
-		putField(board, 3, 4, BLACK);
-		putField(board, 4, 3, BLACK);
-
-		SDL_Event event;
-
-		currentOwner = BLACK;
-		saveState();
+		//Start first game
+		newGame();
 
 		while (running) {
 			while (SDL_PollEvent(&event))
@@ -68,19 +79,4 @@ int main(int argc, char *argv[])
 	}
 
 	exit(0);
-}
-
-void cleanup()
-{
-	destroyBoard(board);
-	if (blackSurface)
-		SDL_FreeSurface(blackSurface);
-	if (whiteSurface)
-		SDL_FreeSurface(whiteSurface);
-	if (boardSurface)
-		SDL_FreeSurface(boardSurface);
-	if (textSurface)
-		SDL_FreeSurface(textSurface);
-
-	SDL_Quit();
 }

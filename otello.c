@@ -87,35 +87,27 @@ int isFieldFree(const Field field)
 	return field.owner != NONE;
 }
 
-void printBoard(Field *board)
-{
-	char owner;
-	for (int i = 0; i < HEIGHT; ++i)
-	{
-		for (int j = 0; j < WIDTH; ++j)
-		{
-			switch (board[HEIGHT * i + j].owner) 
-			{
-				case BLACK:
-					owner = '1';
-					break;
-				case WHITE:
-					owner = '2';
-					break;
-				default:
-					owner = '_';
-					break;
-			}
-			printf("%c ", owner);
-		}
-		printf("\n");
-	}
-}
-
 int onEvent(SDL_Event *event, Field* board)
 {
 	if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_q)
 		return 0;
+
+	if (event->type == SDL_MOUSEBUTTONDOWN && 
+			event->button.button == SDL_BUTTON_LEFT)
+	{
+		int x = event->button.x;
+		int y = event->button.y;
+
+		if (isInRect(x, y, exitDestRect))
+		{
+			return 0;
+		}
+		else if (isInRect(x, y, newDestRect))
+		{
+			newGame();
+			return 1;
+		}
+	}
 	if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_b)
 	{
 		restoreState();
@@ -133,13 +125,14 @@ int onEvent(SDL_Event *event, Field* board)
 		int x = event->button.x;
 		int y = event->button.y;
 
-		if (x < 640 && y < 640)
+		if (x < WIDTH * FIELD_WIDTH && y < HEIGHT * FIELD_WIDTH)
 		{
 			Field field;
-			field.X = event->button.x / 80;
-			field.Y = event->button.y / 80;
-			field = 
-				board[event->button.y / 80 * HEIGHT + event->button.x / 80];
+			field.X = event->button.x / FIELD_WIDTH;
+			field.Y = event->button.y / FIELD_WIDTH;
+			field = board[
+				event->button.y / FIELD_WIDTH * HEIGHT + 
+				event->button.x / FIELD_WIDTH];
 
 			if (isPermittedField(field))
 			{
@@ -159,8 +152,6 @@ int onEvent(SDL_Event *event, Field* board)
 			int hasBlackMoves = hasNextMove(BLACK);
 			if (!hasBlackMoves && !hasWhiteMoves)
 			{
-				printf("\nNo more moves\nScore:\n\twhite: %d\n\tblack: %d\n",
-						scoreForOwner(WHITE), scoreForOwner(BLACK));
 				currentOwner = NONE;
 			}
 			else if (!hasWhiteMoves) 
@@ -179,10 +170,6 @@ int onEvent(SDL_Event *event, Field* board)
 				SDL_WM_SetCaption("WHITE", "Game");
 			else
 				SDL_WM_SetCaption("Otello", "Game");
-		}
-		else if (isInRect(x, y, exitDestRect))
-		{
-			return 0;
 		}
 	}
 	return 1;
@@ -212,30 +199,53 @@ void onRender(const Field* board)
 		{
 			srcRect = cs50SrcRect;
 			destRect = cs50DestRect;
-			SDL_BlitSurface(textSurface, &srcRect, SurfDisplay, &destRect);
+			SDL_BlitSurface(textSurface, &srcRect, 
+					SurfDisplay, &destRect);
 		}
 		// Draw 'Exit' and 'New game' buttons
 		{
 			srcRect = exitSrcRect;
 			destRect = exitDestRect;
-			SDL_BlitSurface(textSurface, &srcRect, SurfDisplay, &destRect);
+			SDL_BlitSurface(textSurface, &srcRect, 
+					SurfDisplay, &destRect);
 
 			srcRect = newSrcRect;
 			destRect = newDestRect;
-			SDL_BlitSurface(textSurface, &srcRect, SurfDisplay, &destRect);
+			SDL_BlitSurface(textSurface, &srcRect, 
+					SurfDisplay, &destRect);
+		}
 
+		// Draw score
+		{
+			destRect = textDestRect;
+			SDL_BlitSurface(scoreSurface, NULL, SurfDisplay, &destRect);
+
+			SDL_FreeSurface(whiteScoreSurface);
+			SDL_FreeSurface(blackScoreSurface);
+
+			snprintf(whiteScoreText, 16, 
+					"    WHITE - %d\0", scoreForOwner(WHITE));
+			snprintf(blackScoreText, 16, 
+					"    BLACK - %d\0", scoreForOwner(BLACK));
+
+			whiteScoreSurface = 
+				TTF_RenderText_Solid(font, whiteScoreText, fontColor);
+			blackScoreSurface = 
+				TTF_RenderText_Solid(font, blackScoreText, fontColor);
+
+			destRect = whiteScoreRect;
+			SDL_BlitSurface(whiteScoreSurface, NULL, 
+					SurfDisplay, &destRect);
+			destRect = blackScoreRect;
+			SDL_BlitSurface(blackScoreSurface, NULL, 
+					SurfDisplay, &destRect);
 		}
 
 		// Draw 'Game over' text
 		if (currentOwner == NONE)
 		{
-			srcRect.x = 0;
-			srcRect.y = 0;
-			srcRect.w = 210;
-			srcRect.h = 35;
-
-			destRect.x = 640 + 20;
-			destRect.y = 40;
+			srcRect = gameOverSrcRect;
+			destRect = gameOverDestRect;
 			SDL_BlitSurface(textSurface, &srcRect, SurfDisplay, &destRect);
 		}
 
@@ -243,7 +253,7 @@ void onRender(const Field* board)
 		{
 			for (int j = 0; j < WIDTH; ++j)
 			{
-				switch (board[8 * i + j].owner)
+				switch (board[HEIGHT * i + j].owner)
 				{
 					case WHITE:
 						surf = whiteSurface;
@@ -333,8 +343,8 @@ SDL_Surface* loadTextSurface()
 void drawItem(SDL_Surface* srcSurf, SDL_Surface* destSurf, int X, int Y)
 {
 	SDL_Rect destRect;
-	destRect.x = X * 80;
-	destRect.y = Y * 80;
+	destRect.x = X * FIELD_WIDTH;
+	destRect.y = Y * FIELD_WIDTH;
 	SDL_BlitSurface(srcSurf, NULL, destSurf, &destRect);
 }
 
@@ -616,3 +626,62 @@ int isInRect(int x, int y, SDL_Rect rect)
 			y <= (rect.y+rect.h)
 		   );
 }
+
+void cleanup()
+{
+	destroyBoard(board);
+	if (blackSurface)
+		SDL_FreeSurface(blackSurface);
+	if (whiteSurface)
+		SDL_FreeSurface(whiteSurface);
+	if (boardSurface)
+		SDL_FreeSurface(boardSurface);
+	if (textSurface)
+		SDL_FreeSurface(textSurface);
+	if (scoreSurface)
+		SDL_FreeSurface(scoreSurface);
+	if (blackScoreSurface)
+		SDL_FreeSurface(blackScoreSurface);
+	if (whiteScoreSurface)
+		SDL_FreeSurface(whiteScoreSurface);
+
+	if (font)
+		TTF_CloseFont(font);
+
+	TTF_Quit();
+	SDL_Quit();
+}
+
+TTF_Font* makeFont(const char* fileName, const unsigned int size)
+{
+	TTF_Font *newFont = TTF_OpenFont(fileName, size);
+	if(!newFont)
+	{
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+	}
+	return newFont;
+}
+
+void newGame()
+{
+	for (int i = 0; i < HEIGHT; ++i)
+	{
+		for (int j = 0; j < WIDTH; ++j)
+		{
+				board[HEIGHT * i + j].owner = NONE;
+		}
+	}
+	setInitialFields();
+	currentOwner = BLACK;
+	saveState();
+	SDL_WM_SetCaption("BLACK", "Game");
+}
+
+void setInitialFields()
+{
+	putField(board, 3, 3, WHITE);
+	putField(board, 4, 4, WHITE);
+	putField(board, 3, 4, BLACK);
+	putField(board, 4, 3, BLACK);
+}
+
