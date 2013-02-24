@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	SurfDisplay = SDL_SetVideoMode(
-			WND_WIDTH, WND_HEIGHT, 32, SDL_FULLSCREEN | 
+			WND_WIDTH, WND_HEIGHT, 32, //SDL_FULLSCREEN | 
 			SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_HWACCEL);
 
 	SDL_WM_SetCaption("Otello", "Game");

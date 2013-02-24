@@ -43,6 +43,9 @@ static SDL_Rect gameOverDestRect = {660,  40, 210,  35};
 static SDL_Rect exitSrcRect  = {  0, 108, 210,  44};
 static SDL_Rect exitDestRect = {660, 246, 210,  44};
 
+// Current owner on panel rect
+static SDL_Rect curOwnerDestRect = {730, 390, 0, 0};
+
 // New game button rect
 static SDL_Rect newSrcRect   = {  0, 152, 210,  44};
 static SDL_Rect newDestRect  = {660, 200, 210,  44};

@@ -92,7 +92,7 @@ int onEvent(SDL_Event *event, Field* board)
 	if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_q)
 		return 0;
 
-	if (event->type == SDL_MOUSEBUTTONDOWN && 
+	if (event->type == SDL_MOUSEBUTTONUP && 
 			event->button.button == SDL_BUTTON_LEFT)
 	{
 		int x = event->button.x;
@@ -119,7 +119,7 @@ int onEvent(SDL_Event *event, Field* board)
 	if (currentOwner == NONE)
 		return 1;
 
-	if (event->type == SDL_MOUSEBUTTONDOWN && 
+	if (event->type == SDL_MOUSEBUTTONUP && 
 			event->button.button == SDL_BUTTON_LEFT)
 	{
 		int x = event->button.x;
@@ -156,12 +156,10 @@ int onEvent(SDL_Event *event, Field* board)
 			}
 			else if (!hasWhiteMoves) 
 			{
-				printf("No more moves for WHITE\n");
 				currentOwner = BLACK;
 			}
 			else if (!hasBlackMoves)
 			{
-				printf("No more moves for BLACK\n");
 				currentOwner = WHITE;
 			}
 			if (currentOwner == BLACK)
@@ -213,6 +211,24 @@ void onRender(const Field* board)
 			destRect = newDestRect;
 			SDL_BlitSurface(textSurface, &srcRect, 
 					SurfDisplay, &destRect);
+		}
+
+		// Draw current owner field on panel
+		{
+			destRect = curOwnerDestRect;
+			switch (currentOwner)
+			{
+				case WHITE:
+					SDL_BlitSurface(whiteSurface, NULL, 
+							SurfDisplay, &destRect);
+					break;
+				case BLACK:
+					SDL_BlitSurface(blackSurface, NULL, 
+							SurfDisplay, &destRect);
+					break;
+				default:
+					break;
+			}
 		}
 
 		// Draw score
