@@ -1,0 +1,6 @@
+Dependencies:
+	libsdl
+	libsdl-ttf
+	libsdl-image
+
+
