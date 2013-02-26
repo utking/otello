@@ -121,17 +121,29 @@ int onEvent(SDL_Event *event, Field* board)
 
 	if (event->type == SDL_USEREVENT && event->user.code == 127)
 	{
-		if (setField(board, event->user.data1, event->user.data2, currentOwner))
+		while (currentOwner == WHITE)
 		{
-			if (currentOwner == BLACK)
-				currentOwner = WHITE;
-			else if (currentOwner == WHITE)
-				currentOwner = BLACK;
-
+			Field nextMove = findNextMove(WHITE);
+			if (setField(board, nextMove.X, nextMove.Y, currentOwner))
+			{
+				int hasWhiteMoves = hasNextMove(WHITE);
+				int hasBlackMoves = hasNextMove(BLACK);
+				if (!hasBlackMoves && !hasWhiteMoves)
+				{
+					currentOwner = NONE;
+				}
+				else if (hasBlackMoves) 
+				{
+					currentOwner = BLACK;
+				}
+				else 
+				{
+					currentOwner = WHITE;
+				}
+			}
 		}
 	}
-
-	if (event->type == SDL_MOUSEBUTTONUP && 
+	else if (event->type == SDL_MOUSEBUTTONUP && 
 			event->button.button == SDL_BUTTON_LEFT)
 	{
 		int x = event->button.x;
@@ -175,22 +187,16 @@ int onEvent(SDL_Event *event, Field* board)
 				currentOwner = WHITE;
 			}
 			if (currentOwner == BLACK)
-				SDL_WM_SetCaption("BLACK", "Game");
+				;
 			else if (currentOwner == WHITE)
 			{
-				SDL_WM_SetCaption("WHITE", "Game");
-				Field nextMove = findNextMove(WHITE);
-				
 				SDL_Event event;
 				event.type = SDL_USEREVENT;
 				event.user.code = 127;
-				event.user.data1 = nextMove.X;
-				event.user.data2 = nextMove.Y;
-				usleep(100000);
+				event.user.data1 = 0;
+				event.user.data2 = 0;
 				SDL_PushEvent(&event);
 			}
-			else
-				SDL_WM_SetCaption("Otello", "Game");
 		}
 	}
 	return 1;

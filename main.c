@@ -1,5 +1,4 @@
 #include "otello.h"
-#include <unistd.h>
 
 #undef main
 
@@ -74,6 +73,8 @@ int main(int argc, char *argv[])
 				running = onEvent(&event, board);
 			}
 			onRender(board);
+			if (currentOwner == BLACK)
+				usleep(200000);
 			usleep(10000);
 		}
 	} else {
