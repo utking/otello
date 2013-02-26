@@ -119,6 +119,18 @@ int onEvent(SDL_Event *event, Field* board)
 	if (currentOwner == NONE)
 		return 1;
 
+	if (event->type == SDL_USEREVENT && event->user.code == 127)
+	{
+		if (setField(board, event->user.data1, event->user.data2, currentOwner))
+		{
+			if (currentOwner == BLACK)
+				currentOwner = WHITE;
+			else if (currentOwner == WHITE)
+				currentOwner = BLACK;
+
+		}
+	}
+
 	if (event->type == SDL_MOUSEBUTTONUP && 
 			event->button.button == SDL_BUTTON_LEFT)
 	{
@@ -165,7 +177,18 @@ int onEvent(SDL_Event *event, Field* board)
 			if (currentOwner == BLACK)
 				SDL_WM_SetCaption("BLACK", "Game");
 			else if (currentOwner == WHITE)
+			{
 				SDL_WM_SetCaption("WHITE", "Game");
+				Field nextMove = findNextMove(WHITE);
+				
+				SDL_Event event;
+				event.type = SDL_USEREVENT;
+				event.user.code = 127;
+				event.user.data1 = nextMove.X;
+				event.user.data2 = nextMove.Y;
+				usleep(100000);
+				SDL_PushEvent(&event);
+			}
 			else
 				SDL_WM_SetCaption("Otello", "Game");
 		}
@@ -517,20 +540,24 @@ Field findNextMove(Owner owner)
 	Owner prevOwner = currentOwner;
 	currentOwner = owner;
 
+	int numFlipped = 0;
+	int numPrevFlipped = 0;
+
 	for (int i = 0; i < HEIGHT; ++i)
 	{
 		for (int j = 0; j < WIDTH; ++j)
 		{
 			if (board[HEIGHT * i + j].owner != NONE)
 				continue;
-			if (canFlipLines(board[HEIGHT * i + j]))
+			if ((numFlipped = canFlipLines(board[HEIGHT * i + j])))
 			{
-				result = board[HEIGHT * i + j];
-				break;
+				if (numFlipped > numPrevFlipped)
+				{
+					result = board[HEIGHT * i + j];
+					numPrevFlipped = numFlipped;
+				}
 			}
 		}
-		if (result.X != -1)
-			break;
 	}
 
 	currentOwner = prevOwner;
@@ -541,13 +568,13 @@ Field findNextMove(Owner owner)
 int canFlipLines(Field field)
 {
 	return 
-		canFlipLine(field, -1, -1) | // Top left
-		canFlipLine(field,  0, -1) | // Top center
-		canFlipLine(field,  1, -1) | // Top right
-		canFlipLine(field, -1,  0) | // Middle left
-		canFlipLine(field,  1,  0) | // Middle right
-		canFlipLine(field, -1,  1) | // Bottom left
-		canFlipLine(field,  0,  1) | // Bottom center
+		canFlipLine(field, -1, -1) + // Top left
+		canFlipLine(field,  0, -1) + // Top center
+		canFlipLine(field,  1, -1) + // Top right
+		canFlipLine(field, -1,  0) + // Middle left
+		canFlipLine(field,  1,  0) + // Middle right
+		canFlipLine(field, -1,  1) + // Bottom left
+		canFlipLine(field,  0,  1) + // Bottom center
 		canFlipLine(field,  1,  1); // Bottom right
 }
 
@@ -590,20 +617,20 @@ int canFlipLine(Field field, int dx, int dy)
 	if (tail)
 	{
 		int startToFlip = 0;
-		int isFlipped = 0;
+		int numFlipped = 0;
 		while (tail)
 		{
 			if (!startToFlip && tail->val->owner == currentOwner)
 				startToFlip = 1;
 			if (startToFlip)
 			{
-				isFlipped = 1;
+				numFlipped++;
 			}
 
 			tail = tail->prev;
 		}
 		removeList(l);
-		return isFlipped;
+		return numFlipped;
 	}
 
 	return 0;
