@@ -8,6 +8,7 @@ SOURCES 	= main.c otello.c
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+	strip $(TARGET)
 
 clean:
 	$(CLEAN) $(TARGET) $(OBJS)

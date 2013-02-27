@@ -19,6 +19,29 @@ int main(int argc, char *argv[])
 		exit(2);
 	}
 
+	char opt[] = "fhm:";
+	int rc;
+
+	while (-1 != (rc = getopt(argc, argv, opt)))
+	{
+		switch (rc) 
+		{
+			case 'h':
+				print_usage(argv);
+				exit(0);
+				break;
+			case 'f':
+				isFullScreen = 1;
+				break;
+			case 'm':
+				if (tolower(optarg[0]) == 'h')
+					gameMode = MODE_HUMAN;
+				break;
+			default:
+				break;
+		}
+	}
+
 	font = makeFont("./fonts/arial.ttf", 28);
 	if(!font)
 		exit(2);
@@ -42,9 +65,11 @@ int main(int argc, char *argv[])
 		printf("SDL_Init failed\n");
 		exit(1);
 	}
-	SurfDisplay = SDL_SetVideoMode(
-			WND_WIDTH, WND_HEIGHT, 32, //SDL_FULLSCREEN | 
-			SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_HWACCEL);
+
+	int sdl_flags = SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_HWACCEL;
+	if (isFullScreen)
+		sdl_flags |= SDL_FULLSCREEN;
+	SurfDisplay = SDL_SetVideoMode(WND_WIDTH, WND_HEIGHT, 32, sdl_flags);
 
 	SDL_WM_SetCaption("Otello", "Game");
 
@@ -65,7 +90,7 @@ int main(int argc, char *argv[])
 		SDL_SetColorKey(textSurface, SDL_SRCCOLORKEY, value);
 
 		//Start first game
-		newGame();
+		newGame(gameMode);
 
 		while (running) {
 			while (SDL_PollEvent(&event))

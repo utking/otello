@@ -61,17 +61,17 @@ int hasNieghbors(const Field field)
 	int x = field.X;
 	int y = field.Y;
 	return
-		isGoorNeighbor(x - 1, y - 1) || // Top left
-		isGoorNeighbor(x - 0, y - 1) || // Top center
-		isGoorNeighbor(x + 1, y - 1) || // Top right
-		isGoorNeighbor(x - 1, y - 0) || // Middle left
-		isGoorNeighbor(x + 1, y - 0) || // Middle right
-		isGoorNeighbor(x - 1, y + 1) || // Bottom left
-		isGoorNeighbor(x - 0, y + 1) || // Bottom center
-		isGoorNeighbor(x + 1, y + 1);	// Bottom right
+		isGoodNeighbor(x - 1, y - 1) || // Top left
+		isGoodNeighbor(x - 0, y - 1) || // Top center
+		isGoodNeighbor(x + 1, y - 1) || // Top right
+		isGoodNeighbor(x - 1, y - 0) || // Middle left
+		isGoodNeighbor(x + 1, y - 0) || // Middle right
+		isGoodNeighbor(x - 1, y + 1) || // Bottom left
+		isGoodNeighbor(x - 0, y + 1) || // Bottom center
+		isGoodNeighbor(x + 1, y + 1);	// Bottom right
 }
 
-int isGoorNeighbor(const int x, const int y)
+int isGoodNeighbor(const int x, const int y)
 {
 	if (x >= 0 && y >= 0 && 
 			(board[y * HEIGHT + x].owner != NONE && 
@@ -104,7 +104,7 @@ int onEvent(SDL_Event *event, Field* board)
 		}
 		else if (isInRect(x, y, newDestRect))
 		{
-			newGame();
+			newGame(gameMode);
 			return 1;
 		}
 	}
@@ -119,7 +119,8 @@ int onEvent(SDL_Event *event, Field* board)
 	if (currentOwner == NONE)
 		return 1;
 
-	if (event->type == SDL_USEREVENT && event->user.code == 127)
+	// Check if in PC game mode
+	if (gameMode == MODE_PC && event->type == SDL_USEREVENT && event->user.code == 127)
 	{
 		while (currentOwner == WHITE)
 		{
@@ -143,6 +144,7 @@ int onEvent(SDL_Event *event, Field* board)
 			}
 		}
 	}
+	// Human turn or game in human mode
 	else if (event->type == SDL_MOUSEBUTTONUP && 
 			event->button.button == SDL_BUTTON_LEFT)
 	{
@@ -188,7 +190,8 @@ int onEvent(SDL_Event *event, Field* board)
 			}
 			if (currentOwner == BLACK)
 				;
-			else if (currentOwner == WHITE)
+			// Send event only for PC game mode
+			else if (gameMode == MODE_PC && currentOwner == WHITE)
 			{
 				SDL_Event event;
 				event.type = SDL_USEREVENT;
@@ -711,8 +714,9 @@ TTF_Font* makeFont(const char* fileName, const unsigned int size)
 	return newFont;
 }
 
-void newGame()
+void newGame(GameMode mode)
 {
+	gameMode = mode;
 	for (int i = 0; i < HEIGHT; ++i)
 	{
 		for (int j = 0; j < WIDTH; ++j)
@@ -734,3 +738,16 @@ void setInitialFields()
 	putField(board, 4, 3, BLACK);
 }
 
+void print_usage(char **argv)
+{
+	printf("Otello. The game.\n"
+			"Usage: %s [flags]\n"
+			"\tFlags:\n"
+			"\t-h -- print this help and exit\n"
+			"\t-f -- fullscreen mode (windowed mode by default)\n"
+			"\t-m arg -- game mode ('c' for PC opponent, "
+			"'h' - for human)\n"
+			"\nThis is CS50\t2013\n",
+			argv[0]
+			);
+}
