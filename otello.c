@@ -124,6 +124,8 @@ int onEvent(SDL_Event *event, Field* board)
 	{
 		while (currentOwner == WHITE)
 		{
+			onRender(board);
+			usleep(1000000);
 			Field nextMove = findNextMove(WHITE);
 			if (setField(board, nextMove.X, nextMove.Y, currentOwner))
 			{
