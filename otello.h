@@ -5,10 +5,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
+
+typedef enum GAME_MODE { 
+	MODE_PC = 10, MODE_HUMAN = 20 
+} GameMode;
 
 static unsigned int WND_WIDTH  = 890;
 static unsigned int WND_HEIGHT = 640;
@@ -16,6 +21,9 @@ static unsigned int WND_HEIGHT = 640;
 static unsigned int WIDTH = 8;
 static unsigned int HEIGHT = 8;
 static unsigned int FIELD_WIDTH = 80;
+
+static int isFullScreen = 0;
+static GameMode gameMode = MODE_PC;
 
 static char whiteScoreText[16];
 static char blackScoreText[16];
@@ -91,7 +99,7 @@ int isPermittedField(const Field field);
 int isFieldFree(const Field field); 
 
 int hasNieghbors(const Field field);
-int isGoorNeighbor(const int x, const int y);
+int isGoodNeighbor(const int x, const int y);
 int hasNextMove(Owner owner);
 int flipLines(Field* field);
 int flipLine(Field* field, int dx, int dy);
@@ -103,10 +111,11 @@ Field findNextMove();
 void restoreState();
 void saveState();
 void setInitialFields();
-void newGame();
+void newGame(GameMode mode);
 
 int isInRect(int x, int y, SDL_Rect rect);
 
+void print_usage(char **argv);
 void cleanup();
 TTF_Font* makeFont(const char* fileName, const unsigned int size);
 
