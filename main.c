@@ -2,9 +2,17 @@
 
 #undef main
 
+unsigned int WND_WIDTH  = 890;
+unsigned int WND_HEIGHT = 640;
+unsigned int WIDTH = 8;
+unsigned int HEIGHT = 8;
+unsigned int FIELD_WIDTH = 80;
+GameMode gameMode = MODE_PC;
+
 int main(int argc, char *argv[])
 {
 	int running = 1;
+	int isFullScreen = 0;
 	blackSurface = NULL;
 	whiteSurface = NULL;
 	SurfDisplay = NULL;
@@ -90,7 +98,7 @@ int main(int argc, char *argv[])
 		SDL_SetColorKey(textSurface, SDL_SRCCOLORKEY, value);
 
 		//Start first game
-		newGame(gameMode);
+		newGame();
 
 		while (running) {
 			while (SDL_PollEvent(&event))

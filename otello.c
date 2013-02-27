@@ -104,7 +104,7 @@ int onEvent(SDL_Event *event, Field* board)
 		}
 		else if (isInRect(x, y, newDestRect))
 		{
-			newGame(gameMode);
+			newGame();
 			return 1;
 		}
 	}
@@ -714,9 +714,8 @@ TTF_Font* makeFont(const char* fileName, const unsigned int size)
 	return newFont;
 }
 
-void newGame(GameMode mode)
+void newGame()
 {
-	gameMode = mode;
 	for (int i = 0; i < HEIGHT; ++i)
 	{
 		for (int j = 0; j < WIDTH; ++j)

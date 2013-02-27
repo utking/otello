@@ -11,22 +11,22 @@
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
 
-typedef enum GAME_MODE { 
+typedef enum GAME_MODE 
+{
 	MODE_PC = 10, MODE_HUMAN = 20 
 } GameMode;
 
-static unsigned int WND_WIDTH  = 890;
-static unsigned int WND_HEIGHT = 640;
+unsigned int WND_WIDTH;
+unsigned int WND_HEIGHT;
 
-static unsigned int WIDTH = 8;
-static unsigned int HEIGHT = 8;
-static unsigned int FIELD_WIDTH = 80;
+unsigned int WIDTH;
+unsigned int HEIGHT;
+unsigned int FIELD_WIDTH;
 
-static int isFullScreen = 0;
-static GameMode gameMode = MODE_PC;
+GameMode gameMode;
 
-static char whiteScoreText[16];
-static char blackScoreText[16];
+char whiteScoreText[16];
+char blackScoreText[16];
 
 SDL_Surface* blackSurface;
 SDL_Surface* whiteSurface;
@@ -111,7 +111,7 @@ Field findNextMove();
 void restoreState();
 void saveState();
 void setInitialFields();
-void newGame(GameMode mode);
+void newGame();
 
 int isInRect(int x, int y, SDL_Rect rect);
 
