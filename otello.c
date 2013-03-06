@@ -107,6 +107,20 @@ int onEvent(SDL_Event *event, Field* board)
 			newGame();
 			return 1;
 		}
+		else if (isInRect(x, y, swOnModeDestRect) ||
+				isInRect(x, y, humanModeDestRect))
+		{
+			gameMode = MODE_PC;
+			newGame();
+			return 1;
+		}
+		else if (isInRect(x, y, swOffModeDestRect) || 
+				isInRect(x, y, pcModeDestRect))
+		{
+			gameMode = MODE_HUMAN;
+			newGame();
+			return 1;
+		}
 	}
 	if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_b)
 	{
@@ -249,6 +263,11 @@ void onRender(const Field* board)
 
 		// Draw current owner field on panel
 		{
+			srcRect = currentSrcRect;
+			destRect = currentDestRect;
+			SDL_BlitSurface(textSurface, &srcRect, 
+					SurfDisplay, &destRect);
+
 			destRect = curOwnerDestRect;
 			switch (currentOwner)
 			{
@@ -267,16 +286,17 @@ void onRender(const Field* board)
 
 		// Draw score
 		{
+			srcRect = scoreSrcRect;
 			destRect = textDestRect;
-			SDL_BlitSurface(scoreSurface, NULL, SurfDisplay, &destRect);
+			SDL_BlitSurface(textSurface, &srcRect, SurfDisplay, &destRect);
 
 			SDL_FreeSurface(whiteScoreSurface);
 			SDL_FreeSurface(blackScoreSurface);
 
 			snprintf(whiteScoreText, 16, 
-					"    WHITE - %d\0", scoreForOwner(WHITE));
+					"    White - %d\0", scoreForOwner(WHITE));
 			snprintf(blackScoreText, 16, 
-					"    BLACK - %d\0", scoreForOwner(BLACK));
+					"    Black - %d\0", scoreForOwner(BLACK));
 
 			whiteScoreSurface = 
 				TTF_RenderText_Solid(font, whiteScoreText, fontColor);
@@ -289,6 +309,33 @@ void onRender(const Field* board)
 			destRect = blackScoreRect;
 			SDL_BlitSurface(blackScoreSurface, NULL, 
 					SurfDisplay, &destRect);
+		}
+
+		//Draw modes
+		{
+			if (gameMode == MODE_PC)
+				srcRect = swOffModeSrcRect;
+			else
+				srcRect = swOnModeSrcRect;
+
+			destRect = swOffModeDestRect;
+			SDL_BlitSurface(textSurface, &srcRect, SurfDisplay, &destRect);
+
+			if (gameMode == MODE_PC)
+				srcRect = swOnModeSrcRect;
+			else
+				srcRect = swOffModeSrcRect;
+
+			destRect = swOnModeDestRect;
+			SDL_BlitSurface(textSurface, &srcRect, SurfDisplay, &destRect);
+
+			srcRect = humanModeSrcRect;
+			destRect = humanModeDestRect;
+			SDL_BlitSurface(textSurface, &srcRect, SurfDisplay, &destRect);
+
+			srcRect = pcModeSrcRect;
+			destRect = pcModeDestRect;
+			SDL_BlitSurface(textSurface, &srcRect, SurfDisplay, &destRect);
 		}
 
 		// Draw 'Game over' text
@@ -692,8 +739,6 @@ void cleanup()
 		SDL_FreeSurface(boardSurface);
 	if (textSurface)
 		SDL_FreeSurface(textSurface);
-	if (scoreSurface)
-		SDL_FreeSurface(scoreSurface);
 	if (blackScoreSurface)
 		SDL_FreeSurface(blackScoreSurface);
 	if (whiteScoreSurface)
@@ -728,7 +773,6 @@ void newGame()
 	setInitialFields();
 	currentOwner = BLACK;
 	saveState();
-	SDL_WM_SetCaption("BLACK", "Game");
 }
 
 void setInitialFields()
