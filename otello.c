@@ -110,15 +110,21 @@ int onEvent(SDL_Event *event, Field* board)
 		else if (isInRect(x, y, swOnModeDestRect) ||
 				isInRect(x, y, humanModeDestRect))
 		{
-			gameMode = MODE_PC;
-			newGame();
+			if (gameMode != MODE_PC)
+			{
+				gameMode = MODE_PC;
+				newGame();
+			}
 			return 1;
 		}
 		else if (isInRect(x, y, swOffModeDestRect) || 
 				isInRect(x, y, pcModeDestRect))
 		{
-			gameMode = MODE_HUMAN;
-			newGame();
+			if (gameMode != MODE_HUMAN)
+			{
+				gameMode = MODE_HUMAN;
+				newGame();
+			}
 			return 1;
 		}
 	}
