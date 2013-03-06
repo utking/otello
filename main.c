@@ -50,13 +50,9 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	font = makeFont("./fonts/arial.ttf", 28);
+	font = makeFont("./fonts/arial.ttf", 22);
 	if(!font)
 		exit(2);
-
-	scoreSurface = TTF_RenderText_Solid(font, "Score:", fontColor);
-	TTF_CloseFont(font);
-	font = makeFont("./fonts/arial.ttf", 22);
 
 	atexit(cleanup);
 
