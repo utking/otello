@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 		sdl_flags |= SDL_FULLSCREEN;
 	SurfDisplay = SDL_SetVideoMode(WND_WIDTH, WND_HEIGHT, 32, sdl_flags);
 
-	SDL_WM_SetCaption("Otello", "Game");
+	SDL_WM_SetCaption("Otello. Kitchen style", "Game");
 
 	boardSurface = loadBackground();
 	blackSurface = loadBlack();
