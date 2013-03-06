@@ -11,4 +11,4 @@ $(TARGET): $(OBJS)
 	strip $(TARGET)
 
 clean:
-	$(CLEAN) $(TARGET) $(OBJS)
+	$(CLEAN) $(OBJS)
