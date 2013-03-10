@@ -6,6 +6,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <time.h>
+#include <signal.h>
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
@@ -16,6 +18,11 @@ typedef enum GAME_MODE
 	MODE_PC = 10, MODE_HUMAN = 20 
 } GameMode;
 
+typedef enum GAME_TACTIC
+{
+	T_BEST = 21, T_WORST = 31, T_FIRST = 41, T_RANDOM = 51
+} GameTactic;
+
 unsigned int WND_WIDTH;
 unsigned int WND_HEIGHT;
 
@@ -24,6 +31,7 @@ unsigned int HEIGHT;
 unsigned int FIELD_WIDTH;
 
 GameMode gameMode;
+GameTactic gameTactic;
 
 char whiteScoreText[16];
 char blackScoreText[16];
@@ -128,7 +136,12 @@ int flipLine(Field* field, int dx, int dy);
 int canFlipLines(Field field);
 int canFlipLine(Field field, int dx, int dy);
 int scoreForOwner(Owner owner);
-Field findNextMove();
+Field findNextMove(Owner owner);
+
+Field findBestMove(Owner owner);
+Field findWorstMove(Owner owner);
+Field findFirstAvailMove(Owner owner);
+Field findRandomMove(Owner owner);
 
 void restoreState();
 void saveState();

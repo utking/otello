@@ -7,6 +7,7 @@ unsigned int WIDTH = 8;
 unsigned int HEIGHT = 8;
 unsigned int FIELD_WIDTH = 80;
 GameMode gameMode = MODE_PC;
+GameTactic gameTactic = T_BEST;
 
 char whiteScoreText[16];
 char blackScoreText[16];
@@ -524,7 +525,7 @@ void drawItem(SDL_Surface* srcSurf, SDL_Surface* destSurf, int X, int Y)
 
 int hasNextMove(Owner owner)
 {
-	Field result = findNextMove(owner);
+	Field result = findFirstAvailMove(owner);
 	return result.X != -1;
 }
 
@@ -667,6 +668,25 @@ int scoreForOwner(Owner owner)
 
 Field findNextMove(Owner owner)
 {
+	if (gameMode == MODE_PC)
+	{
+		switch (gameTactic)
+		{
+			case T_WORST:
+				return findWorstMove(owner);
+			case T_FIRST:
+				return findFirstAvailMove(owner);
+			case T_RANDOM:
+				return findRandomMove(owner);
+			default:
+				return findBestMove(owner);
+		}
+	}
+	return findFirstAvailMove(owner);
+}
+
+Field findBestMove(Owner owner)
+{
 	Field result;
 	result.X = -1;
 
@@ -694,7 +714,123 @@ Field findNextMove(Owner owner)
 	}
 
 	currentOwner = prevOwner;
+	return result;
+}
 
+Field findWorstMove(Owner owner)
+{
+	Field result;
+	result.X = -1;
+
+	Owner prevOwner = currentOwner;
+	currentOwner = owner;
+
+	int numFlipped = 0;
+	int numPrevFlipped = WIDTH * HEIGHT;
+
+	for (int i = 0; i < HEIGHT; ++i)
+	{
+		for (int j = 0; j < WIDTH; ++j)
+		{
+			if (board[HEIGHT * i + j].owner != NONE)
+				continue;
+			if ((numFlipped = canFlipLines(board[HEIGHT * i + j])))
+			{
+				if (numFlipped < numPrevFlipped)
+				{
+					result = board[HEIGHT * i + j];
+					numPrevFlipped = numFlipped;
+				}
+			}
+		}
+	}
+
+	currentOwner = prevOwner;
+	return result;
+}
+
+Field findRandomMove(Owner owner)
+{
+	unsigned short emptyFieldsCount = scoreForOwner(NONE);
+	Field result;
+	result.X = -1;
+
+	if (emptyFieldsCount)
+	{
+		srand(time(NULL)); // initialize random seed
+
+		Field *emptyFields = 
+			(Field*)malloc(sizeof(Field) * emptyFieldsCount);
+		unsigned short curFieldPos = 0;
+
+		// copy empty and valid for flipping 
+		// fields in a new array
+		for (int i = 0; i < HEIGHT; ++i)
+		{
+			for (int j = 0; j < WIDTH; ++j)
+			{
+				if (board[HEIGHT * i + j].owner == NONE && 
+						canFlipLines(board[HEIGHT * i + j]))
+				{
+					emptyFields[curFieldPos] = 
+						board[HEIGHT * i + j];
+					curFieldPos++;
+				}
+			}
+		}
+
+		// correct empty fields count with real number
+		emptyFieldsCount = curFieldPos;
+
+		// remember old owner
+		Owner prevOwner = currentOwner;
+		// and set new owner to check
+		currentOwner = owner;
+
+		while (1)
+		{
+			// peek next field
+			curFieldPos = rand() % emptyFieldsCount;
+			// check if we can flip any lines with it
+			if (canFlipLines(emptyFields[curFieldPos]))
+			{
+				result = emptyFields[curFieldPos];
+				break;
+			}
+		}
+
+		free(emptyFields);
+		// restore previous owner
+		currentOwner = prevOwner;
+	}
+
+	return result;
+}
+
+Field findFirstAvailMove(Owner owner)
+{
+	Field result;
+	result.X = -1;
+
+	Owner prevOwner = currentOwner;
+	currentOwner = owner;
+
+	for (int i = 0; i < WIDTH; ++i)
+	{
+		for (int j = 0; j < HEIGHT; ++j)
+		{
+			if (board[HEIGHT * i + j].owner != NONE)
+				continue;
+			if (canFlipLines(board[HEIGHT * i + j]))
+			{
+				result = board[HEIGHT * i + j];
+				currentOwner = prevOwner;
+				return result;
+			}
+		}
+	}
+
+	currentOwner = prevOwner;
 	return result;
 }
 
@@ -865,6 +1001,10 @@ void print_usage(char **argv)
 			"\t-f -- fullscreen mode (windowed mode by default)\n"
 			"\t-m arg -- game mode ('c' for PC opponent, "
 			"'h' - for human)\n"
+			"\t-t arg -- game tactic ('w' - PC always choose worts move,\n"
+			"\t\t'r' - PC always choose random move, "
+			"\t\t'f' - PC always choose first available move, "
+			"\t\tdefault mode - PC always choose best move)\n"
 			"\nThis is CS50\t2013\n",
 			argv[0]
 			);

@@ -2,6 +2,8 @@
 
 #undef main
 
+void sig_handler(int signal);
+
 int main(int argc, char *argv[])
 {
 	int running = 1;
@@ -20,7 +22,7 @@ int main(int argc, char *argv[])
 		exit(2);
 	}
 
-	char opt[] = "fhm:";
+	char opt[] = "fhm:t:";
 	int rc;
 
 	while (-1 != (rc = getopt(argc, argv, opt)))
@@ -37,6 +39,14 @@ int main(int argc, char *argv[])
 			case 'm':
 				if (tolower(optarg[0]) == 'h')
 					gameMode = MODE_HUMAN;
+				break;
+			case 't':
+				if (tolower(optarg[0]) == 'w')
+					gameTactic = T_WORST;
+				else if (tolower(optarg[0]) == 'f')
+					gameTactic = T_FIRST;
+				else if (tolower(optarg[0]) == 'r')
+					gameTactic = T_RANDOM;
 				break;
 			default:
 				break;
@@ -89,6 +99,8 @@ int main(int argc, char *argv[])
 		//Start first game
 		newGame();
 
+		signal(SIGINT, sig_handler);
+
 		while (running) {
 			while (SDL_PollEvent(&event))
 			{
@@ -102,4 +114,13 @@ int main(int argc, char *argv[])
 	}
 
 	exit(0);
+}
+
+void sig_handler(int signal)
+{
+	if (signal == SIGINT)
+	{
+		printf("Exit by signal\n");
+		exit(0);
+	}
 }
