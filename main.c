@@ -2,13 +2,6 @@
 
 #undef main
 
-unsigned int WND_WIDTH  = 890;
-unsigned int WND_HEIGHT = 640;
-unsigned int WIDTH = 8;
-unsigned int HEIGHT = 8;
-unsigned int FIELD_WIDTH = 80;
-GameMode gameMode = MODE_PC;
-
 int main(int argc, char *argv[])
 {
 	int running = 1;

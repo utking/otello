@@ -1,5 +1,76 @@
 #include "otello.h"
 
+
+unsigned int WND_WIDTH  = 890;
+unsigned int WND_HEIGHT = 640;
+unsigned int WIDTH = 8;
+unsigned int HEIGHT = 8;
+unsigned int FIELD_WIDTH = 80;
+GameMode gameMode = MODE_PC;
+
+char whiteScoreText[16];
+char blackScoreText[16];
+
+SDL_Surface* blackSurface;
+SDL_Surface* whiteSurface;
+SDL_Surface* SurfDisplay;
+SDL_Surface* boardSurface;
+SDL_Surface* textSurface;
+
+SDL_Surface* whiteScoreSurface;
+SDL_Surface* blackScoreSurface;
+
+// Score font and text
+TTF_Font *font;
+SDL_Color fontColor = {30, 30, 30, 0};
+SDL_Rect textDestRect =   {720,  20, 210,  44};
+SDL_Rect whiteScoreRect = {670,  60, 210,  44};
+SDL_Rect blackScoreRect = {670,  90, 210,  44};
+
+// Score image rect
+SDL_Rect scoreSrcRect  = { 52,  33, 120,  39};
+
+// Game over rect
+SDL_Rect gameOverSrcRect  = {  0,   0, 210,  35};
+SDL_Rect gameOverDestRect = {660, 470, 210,  35};
+
+// On mode switcher rect
+SDL_Rect swOnModeSrcRect  = {  2, 200,  30,  30};
+SDL_Rect swOnModeDestRect = {670, 135,  30,  30};
+
+// Off mode switcher rect
+SDL_Rect swOffModeSrcRect  = { 32, 200,  30,  30};
+SDL_Rect swOffModeDestRect = {670, 163,  30,  30};
+
+// Human mode rect
+SDL_Rect humanModeSrcRect  = {  0, 230, 210,  35};
+SDL_Rect humanModeDestRect = {695, 132, 210,  35};
+
+// PC mode rect
+SDL_Rect pcModeSrcRect  = {  0, 265, 210,  35};
+SDL_Rect pcModeDestRect = {695, 167, 210,  35};
+
+// Exit button rect
+SDL_Rect exitSrcRect  = {  0, 108, 210,  44};
+SDL_Rect exitDestRect = {660, 266, 210,  44};
+
+// 'Current' text rect
+SDL_Rect currentSrcRect  = { 85, 200, 115,  30};
+SDL_Rect currentDestRect = {710, 410, 210,  44};
+
+// Current owner on panel rect
+SDL_Rect curOwnerDestRect = {730, 450, 0, 0};
+
+// New game button rect
+SDL_Rect newSrcRect   = {  0, 152, 210,  44};
+SDL_Rect newDestRect  = {660, 220, 210,  44};
+
+// CS50 text rect
+SDL_Rect cs50SrcRect  = { 10,  70, 180,  38};
+SDL_Rect cs50DestRect = {670, 580,   0,   0};
+
+
+
 Field* createBoard()
 {
 	Field *board = malloc(WIDTH * HEIGHT * sizeof(Field));
@@ -300,9 +371,9 @@ void onRender(const Field* board)
 			SDL_FreeSurface(blackScoreSurface);
 
 			snprintf(whiteScoreText, 16, 
-					"    White - %d\0", scoreForOwner(WHITE));
+					"    White - %d", scoreForOwner(WHITE));
 			snprintf(blackScoreText, 16, 
-					"    Black - %d\0", scoreForOwner(BLACK));
+					"    Black - %d", scoreForOwner(BLACK));
 
 			whiteScoreSurface = 
 				TTF_RenderText_Solid(font, whiteScoreText, fontColor);
@@ -474,9 +545,7 @@ int flipLine(Field* field, int dx, int dy)
 {
 	int curX = field->X + dx;
 	int curY = field->Y + dy;
-	Field* lastInLine = NULL;
 	Field* curField = field;
-	Field* foeField = NULL;
 
 	if ((curX >= 0 && curY >= 0)
 			&& (curX < WIDTH && curY < HEIGHT))
@@ -646,9 +715,7 @@ int canFlipLine(Field field, int dx, int dy)
 {
 	int curX = field.X + dx;
 	int curY = field.Y + dy;
-	Field* lastInLine = NULL;
 	Field* curField = &field;
-	Field* foeField = NULL;
 
 	if ((curX >= 0 && curY >= 0)
 			&& (curX < WIDTH && curY < HEIGHT))

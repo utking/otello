@@ -39,52 +39,52 @@ SDL_Surface* blackScoreSurface;
 
 // Score font and text
 TTF_Font *font;
-static SDL_Color fontColor = {30, 30, 30, 0};
-static SDL_Rect textDestRect =   {720,  20, 210,  44};
-static SDL_Rect whiteScoreRect = {670,  60, 210,  44};
-static SDL_Rect blackScoreRect = {670,  90, 210,  44};
+SDL_Color fontColor;
+SDL_Rect textDestRect;
+SDL_Rect whiteScoreRect;
+SDL_Rect blackScoreRect;
 
 // Score image rect
-static SDL_Rect scoreSrcRect  = { 52,  33, 120,  39};
+SDL_Rect scoreSrcRect;
 
 // Game over rect
-static SDL_Rect gameOverSrcRect  = {  0,   0, 210,  35};
-static SDL_Rect gameOverDestRect = {660, 470, 210,  35};
+SDL_Rect gameOverSrcRect;
+SDL_Rect gameOverDestRect;
 
 // On mode switcher rect
-static SDL_Rect swOnModeSrcRect  = {  2, 200,  30,  30};
-static SDL_Rect swOnModeDestRect = {670, 135,  30,  30};
+SDL_Rect swOnModeSrcRect;
+SDL_Rect swOnModeDestRect;
 
 // Off mode switcher rect
-static SDL_Rect swOffModeSrcRect  = { 32, 200,  30,  30};
-static SDL_Rect swOffModeDestRect = {670, 163,  30,  30};
+SDL_Rect swOffModeSrcRect;
+SDL_Rect swOffModeDestRect;
 
 // Human mode rect
-static SDL_Rect humanModeSrcRect  = {  0, 230, 210,  35};
-static SDL_Rect humanModeDestRect = {695, 132, 210,  35};
+SDL_Rect humanModeSrcRect;
+SDL_Rect humanModeDestRect;
 
 // PC mode rect
-static SDL_Rect pcModeSrcRect  = {  0, 265, 210,  35};
-static SDL_Rect pcModeDestRect = {695, 167, 210,  35};
+SDL_Rect pcModeSrcRect;
+SDL_Rect pcModeDestRect;
 
 // Exit button rect
-static SDL_Rect exitSrcRect  = {  0, 108, 210,  44};
-static SDL_Rect exitDestRect = {660, 266, 210,  44};
+SDL_Rect exitSrcRect;
+SDL_Rect exitDestRect;
 
 // 'Current' text rect
-static SDL_Rect currentSrcRect  = { 85, 200, 115,  30};
-static SDL_Rect currentDestRect = {710, 410, 210,  44};
+SDL_Rect currentSrcRect;
+SDL_Rect currentDestRect;
 
 // Current owner on panel rect
-static SDL_Rect curOwnerDestRect = {730, 450, 0, 0};
+SDL_Rect curOwnerDestRect;
 
 // New game button rect
-static SDL_Rect newSrcRect   = {  0, 152, 210,  44};
-static SDL_Rect newDestRect  = {660, 220, 210,  44};
+SDL_Rect newSrcRect;
+SDL_Rect newDestRect;
 
 // CS50 text rect
-static SDL_Rect cs50SrcRect  = { 10,  70, 180,  38};
-static SDL_Rect cs50DestRect = {670, 580,   0,   0};
+SDL_Rect cs50SrcRect;
+SDL_Rect cs50DestRect;
 
 typedef enum OWNER { 
 	NONE = 0, 
