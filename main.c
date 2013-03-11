@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 				running = onEvent(&event, board);
 			}
 			onRender(board);
-			usleep(10000);
+			SDL_Delay(10);
 		}
 	} else {
 		exit(1);
