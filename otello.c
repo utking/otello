@@ -22,8 +22,6 @@ SDL_Surface* whiteScoreSurface;
 SDL_Surface* blackScoreSurface;
 
 // Score font and text
-TTF_Font *font;
-SDL_Color fontColor = {30, 30, 30, 0};
 SDL_Rect textDestRect =   {720,  20, 210,  44};
 SDL_Rect whiteScoreRect = {670,  60, 210,  44};
 SDL_Rect blackScoreRect = {670,  90, 210,  44};
@@ -53,7 +51,7 @@ SDL_Rect pcModeDestRect = {695, 167, 210,  35};
 
 // Exit button rect
 SDL_Rect exitSrcRect  = {  0, 108, 210,  44};
-SDL_Rect exitDestRect = {660, 266, 210,  44};
+SDL_Rect exitDestRect = {660, 580, 210,  44};
 
 // 'Current' text rect
 SDL_Rect currentSrcRect  = { 85, 200, 115,  30};
@@ -65,11 +63,6 @@ SDL_Rect curOwnerDestRect = {730, 450, 0, 0};
 // New game button rect
 SDL_Rect newSrcRect   = {  0, 152, 210,  44};
 SDL_Rect newDestRect  = {660, 220, 210,  44};
-
-// CS50 text rect
-SDL_Rect cs50SrcRect  = { 10,  70, 180,  38};
-SDL_Rect cs50DestRect = {670, 580,   0,   0};
-
 
 
 Field* createBoard()
@@ -319,13 +312,6 @@ void onRender(const Field* board)
 
 		SDL_BlitSurface(boardSurface, NULL, SurfDisplay, &destRect);
 
-		// Draw 'This is cs50' text
-		{
-			srcRect = cs50SrcRect;
-			destRect = cs50DestRect;
-			SDL_BlitSurface(textSurface, &srcRect, 
-					SurfDisplay, &destRect);
-		}
 		// Draw 'Exit' and 'New game' buttons
 		{
 			srcRect = exitSrcRect;
@@ -368,18 +354,10 @@ void onRender(const Field* board)
 			destRect = textDestRect;
 			SDL_BlitSurface(textSurface, &srcRect, SurfDisplay, &destRect);
 
-			SDL_FreeSurface(whiteScoreSurface);
-			SDL_FreeSurface(blackScoreSurface);
-
 			snprintf(whiteScoreText, 16, 
 					"    White - %d", scoreForOwner(WHITE));
 			snprintf(blackScoreText, 16, 
 					"    Black - %d", scoreForOwner(BLACK));
-
-			whiteScoreSurface = 
-				TTF_RenderText_Solid(font, whiteScoreText, fontColor);
-			blackScoreSurface = 
-				TTF_RenderText_Solid(font, blackScoreText, fontColor);
 
 			destRect = whiteScoreRect;
 			SDL_BlitSurface(whiteScoreSurface, NULL, 
@@ -953,21 +931,7 @@ void cleanup()
 	if (whiteScoreSurface)
 		SDL_FreeSurface(whiteScoreSurface);
 
-	if (font)
-		TTF_CloseFont(font);
-
-	TTF_Quit();
 	SDL_Quit();
-}
-
-TTF_Font* makeFont(const char* fileName, const unsigned int size)
-{
-	TTF_Font *newFont = TTF_OpenFont(fileName, size);
-	if(!newFont)
-	{
-		printf("TTF_OpenFont: %s\n", TTF_GetError());
-	}
-	return newFont;
 }
 
 void newGame()
@@ -1005,7 +969,7 @@ void print_usage(char **argv)
 			"\t\t'r' - PC always choose random move, "
 			"\t\t'f' - PC always choose first available move, "
 			"\t\tdefault mode - PC always choose best move)\n"
-			"\nThis is CS50\t2013\n",
+			"\nUtkinG\t2013\n",
 			argv[0]
 			);
 }

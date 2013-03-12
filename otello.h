@@ -11,7 +11,6 @@
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
-#include <SDL/SDL_ttf.h>
 
 typedef enum GAME_MODE 
 {
@@ -46,8 +45,6 @@ SDL_Surface* whiteScoreSurface;
 SDL_Surface* blackScoreSurface;
 
 // Score font and text
-TTF_Font *font;
-SDL_Color fontColor;
 SDL_Rect textDestRect;
 SDL_Rect whiteScoreRect;
 SDL_Rect blackScoreRect;
@@ -89,10 +86,6 @@ SDL_Rect curOwnerDestRect;
 // New game button rect
 SDL_Rect newSrcRect;
 SDL_Rect newDestRect;
-
-// CS50 text rect
-SDL_Rect cs50SrcRect;
-SDL_Rect cs50DestRect;
 
 typedef enum OWNER { 
 	NONE = 0, 
@@ -152,7 +145,6 @@ int isInRect(int x, int y, SDL_Rect rect);
 
 void print_usage(char **argv);
 void cleanup();
-TTF_Font* makeFont(const char* fileName, const unsigned int size);
 
 // ------- SDL routines ----
 

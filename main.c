@@ -14,14 +14,6 @@ int main(int argc, char *argv[])
 	boardSurface = NULL;
 	textSurface = NULL;
 
-	font = NULL;
-
-	if(TTF_Init()==-1)
-	{
-		printf("TTF_Init: %s\n", TTF_GetError());
-		exit(2);
-	}
-
 	char opt[] = "fhm:t:";
 	int rc;
 
@@ -52,10 +44,6 @@ int main(int argc, char *argv[])
 				break;
 		}
 	}
-
-	font = makeFont("./fonts/arial.ttf", 22);
-	if(!font)
-		exit(2);
 
 	atexit(cleanup);
 
