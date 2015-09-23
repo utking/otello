@@ -120,7 +120,7 @@ int setField(Field* board,
 		int X, int Y, 
 		Owner owner);
 // Set field without checks
-int putField(Field* board, 
+void putField(Field* board, 
 		int X, int Y, 
 		Owner owner);
 
@@ -158,6 +158,7 @@ TTF_Font* makeFont(const char* fileName, const unsigned int size);
 
 int onEvent(SDL_Event *event, Field* board);
 void onRender(const Field* board);
+SDL_Surface* loadColor(const char *);
 SDL_Surface* loadBackground();
 SDL_Surface* loadBlack();
 SDL_Surface* loadWhite();

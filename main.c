@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 
 	font = NULL;
 
-	if(TTF_Init()==-1)
+	if(TTF_Init() == -1)
 	{
 		printf("TTF_Init: %s\n", TTF_GetError());
 		exit(2);
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 	prevBoard = createBoard();
 	if (!board)
 	{
-		printf("%s\n", "Can't create board. Terminate.");
+		printf("Can't create board. Terminate.");
 		exit(1);
 	}
 
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 		value = SDL_MapRGB(textSurface->format, 0, 0, 255);
 		SDL_SetColorKey(textSurface, SDL_SRCCOLORKEY, value);
 
-		//Start first game
+		//Start the first game
 		newGame();
 
 		signal(SIGINT, sig_handler);

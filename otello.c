@@ -1,6 +1,5 @@
 #include "otello.h"
 
-
 unsigned int WND_WIDTH  = 890;
 unsigned int WND_HEIGHT = 640;
 unsigned int WIDTH = 8;
@@ -75,8 +74,7 @@ SDL_Rect cs50DestRect = {670, 580,   0,   0};
 Field* createBoard()
 {
 	Field *board = malloc(WIDTH * HEIGHT * sizeof(Field));
-	if (!board)
-		return NULL;
+	if (!board) return NULL;
 
 	for (int i = 0; i < HEIGHT; ++i)
 	{
@@ -92,8 +90,7 @@ Field* createBoard()
 
 void destroyBoard(Field *board)
 {
-	if (board)
-	{
+	if (board) {
 		free(board);
 		board = NULL;
 	}
@@ -114,10 +111,9 @@ int setField(Field* board, int X, int Y,
 	return 0;
 }
 
-int putField(Field* board, int X, int Y, Owner owner)
+void putField(Field* board, int X, int Y, Owner owner)
 {
 	board[HEIGHT * Y + X].owner = owner;
-	return 1;
 }
 
 int isPermittedField(const Field field)
@@ -145,13 +141,8 @@ int hasNieghbors(const Field field)
 
 int isGoodNeighbor(const int x, const int y)
 {
-	if (x >= 0 && y >= 0 && 
-			(board[y * HEIGHT + x].owner != NONE && 
-			 board[y * HEIGHT + x].owner != currentOwner))
-	{
-		return 1;
-	}
-	return 0;
+	return (x >= 0 && y >= 0 && (board[y * HEIGHT + x].owner != NONE && 
+			 board[y * HEIGHT + x].owner != currentOwner));
 }
 
 int isFieldFree(const Field field)
@@ -170,38 +161,29 @@ int onEvent(SDL_Event *event, Field* board)
 		int x = event->button.x;
 		int y = event->button.y;
 
-		if (isInRect(x, y, exitDestRect))
-		{
+		if (isInRect(x, y, exitDestRect)) {
 			return 0;
-		}
-		else if (isInRect(x, y, newDestRect))
-		{
+		} else if (isInRect(x, y, newDestRect)) {
 			newGame();
 			return 1;
-		}
-		else if (isInRect(x, y, swOnModeDestRect) ||
-				isInRect(x, y, humanModeDestRect))
-		{
-			if (gameMode != MODE_PC)
-			{
+		} else if (isInRect(x, y, swOnModeDestRect) ||
+				isInRect(x, y, humanModeDestRect)) {
+			if (gameMode != MODE_PC) {
 				gameMode = MODE_PC;
 				newGame();
 			}
 			return 1;
-		}
-		else if (isInRect(x, y, swOffModeDestRect) || 
-				isInRect(x, y, pcModeDestRect))
-		{
-			if (gameMode != MODE_HUMAN)
-			{
+		} else if (isInRect(x, y, swOffModeDestRect) || 
+				isInRect(x, y, pcModeDestRect)) {
+			if (gameMode != MODE_HUMAN) {
 				gameMode = MODE_HUMAN;
 				newGame();
 			}
 			return 1;
 		}
 	}
-	if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_b)
-	{
+
+	if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_b) {
 		restoreState();
 		return 1;
 	}
@@ -212,27 +194,19 @@ int onEvent(SDL_Event *event, Field* board)
 		return 1;
 
 	// Check if in PC game mode
-	if (gameMode == MODE_PC && event->type == SDL_USEREVENT && event->user.code == 127)
-	{
-		while (currentOwner == WHITE)
-		{
+	if (gameMode == MODE_PC && event->type == SDL_USEREVENT && event->user.code == 127) {
+		while (currentOwner == WHITE) {
 			onRender(board);
 			SDL_Delay(600);
 			Field nextMove = findNextMove(WHITE);
-			if (setField(board, nextMove.X, nextMove.Y, currentOwner))
-			{
+			if (setField(board, nextMove.X, nextMove.Y, currentOwner)) {
 				int hasWhiteMoves = hasNextMove(WHITE);
 				int hasBlackMoves = hasNextMove(BLACK);
-				if (!hasBlackMoves && !hasWhiteMoves)
-				{
+				if (!hasBlackMoves && !hasWhiteMoves) {
 					currentOwner = NONE;
-				}
-				else if (hasBlackMoves) 
-				{
+				} else if (hasBlackMoves) {
 					currentOwner = BLACK;
-				}
-				else 
-				{
+				} else {
 					currentOwner = WHITE;
 				}
 			}
@@ -252,7 +226,7 @@ int onEvent(SDL_Event *event, Field* board)
 			field.Y = event->button.y / FIELD_WIDTH;
 			field = board[
 				event->button.y / FIELD_WIDTH * HEIGHT + 
-				event->button.x / FIELD_WIDTH];
+					event->button.x / FIELD_WIDTH];
 
 			if (isPermittedField(field))
 			{
@@ -447,68 +421,44 @@ void onRender(const Field* board)
 	}
 }
 
-SDL_Surface* loadBackground()
-{
-	SDL_Surface* tmp = IMG_Load("./images/board.png");
-	if (tmp == NULL)
-	{
-		printf("Load board file [%s] failed\n", "./images/board.png");
+SDL_Surface* loadColor(const char *file_path) {
+	SDL_Surface* tmp = IMG_Load(file_path);
+	if (tmp == NULL) {
+		printf("Load file [%s] failed\n", "./images/black.png");
 		return NULL;
 	}
-	SDL_Surface* boardSurface = SDL_DisplayFormat(tmp);
-	if (boardSurface == NULL)
-	{
+	SDL_Surface* surface = SDL_DisplayFormatAlpha(tmp);
+	if (surface == NULL) {
 		printf("SDL_DisplayFormat failed: %s\n", SDL_GetError());
 		return NULL;
 	}
-	return boardSurface;
+	return surface;
+}
+
+SDL_Surface* loadBackground()
+{
+	return loadColor("./images/board.png");
 }
 
 SDL_Surface* loadBlack()
 {
-	SDL_Surface* tmp = IMG_Load("./images/black.png");
-	if (tmp == NULL)
-	{
-		printf("Load black file [%s] failed\n", "./images/black.png");
-		return NULL;
-	}
-	SDL_Surface* surface = SDL_DisplayFormatAlpha(tmp);
-	if (surface == NULL)
-	{
-		printf("SDL_DisplayFormat failed: %s\n", SDL_GetError());
-		return NULL;
-	}
-	return surface;
+	return loadColor("./images/black.png");
 }
 
 SDL_Surface* loadWhite()
 {
-	SDL_Surface* tmp = IMG_Load("./images/white.png");
-	if (tmp == NULL)
-	{
-		printf("Load black file [%s] failed\n", "./images/white.png");
-		return NULL;
-	}
-	SDL_Surface* surface = SDL_DisplayFormatAlpha(tmp);
-	if (surface == NULL)
-	{
-		printf("SDL_DisplayFormat failed: %s\n", SDL_GetError());
-		return NULL;
-	}
-	return surface;
+	return loadColor("./images/white.png");
 }
 
 SDL_Surface* loadTextSurface()
 {
 	SDL_Surface* tmp = IMG_Load("./images/text.png");
-	if (tmp == NULL)
-	{
-		printf("Load text file [%s] failed\n", "./images/text.png");
+	if (tmp == NULL) {
+		printf("Load texture file [%s] failed\n", "./images/text.png");
 		return NULL;
 	}
 	SDL_Surface* surface = SDL_DisplayFormatAlpha(tmp);
-	if (surface == NULL)
-	{
+	if (surface == NULL) {
 		printf("SDL_DisplayFormat failed: %s\n", SDL_GetError());
 		return NULL;
 	}
@@ -548,20 +498,15 @@ int flipLine(Field* field, int dx, int dy)
 	int curY = field->Y + dy;
 	Field* curField = field;
 
-	if ((curX >= 0 && curY >= 0)
-			&& (curX < WIDTH && curY < HEIGHT))
-	{
+	if ((curX >= 0 && curY >= 0) && (curX < WIDTH && curY < HEIGHT)) {
 		if (board[curY * HEIGHT + curX].owner == currentOwner)
 			return 0;
 	}
 
 	list* l = NULL;
-	while ((curX >= 0 && curY >= 0)
-			&& (curX < WIDTH && curY < HEIGHT))
-	{
+	while ((curX >= 0 && curY >= 0) && (curX < WIDTH && curY < HEIGHT)) {
 		curField = &(board[curY * HEIGHT + curX]);
-		if (curField->owner != NONE)
-		{
+		if (curField->owner != NONE) {
 			list* el = makeElement(curField);
 			if (!l)
 				l = el;
@@ -576,16 +521,13 @@ int flipLine(Field* field, int dx, int dy)
 	}
 
 	list* tail = getTail(l);
-	if (tail)
-	{
+	if (tail) {
 		int startToFlip = 0;
 		int isFlipped = 0;
-		while (tail)
-		{
+		while (tail) {
 			if (!startToFlip && tail->val->owner == currentOwner)
-				startToFlip = 1;
-			if (startToFlip)
-			{
+				startToFlip = 1; 
+			if (startToFlip) {
 				putField(board, 
 						tail->val->X, tail->val->Y,
 						currentOwner);
@@ -603,16 +545,13 @@ int flipLine(Field* field, int dx, int dy)
 
 void addElement(list* l, list* el)
 {
-	if (!el)
-		return;
+	if (!el) return;
 
 	if (!l)
 		l = el;
-	else
-	{
+	else {
 		list* top = l;
-		while (top->next)
-			top = top->next;
+		while (top->next) top = top->next;
 		top->next = el;
 		el->prev = top;
 	}
@@ -621,8 +560,7 @@ void addElement(list* l, list* el)
 list* makeElement(Field* val)
 {
 	list* element = (list*)malloc(sizeof(list));
-	if (element)
-	{
+	if (element) {
 		element->val = val;
 		element->next = NULL;
 		element->prev = NULL;
@@ -633,8 +571,7 @@ list* makeElement(Field* val)
 void removeList(list* l)
 {
 	list* top = l;
-	while (top->next)
-	{
+	while (top->next) {
 		list* cur = top;
 		top = top->next;
 		free(cur);
@@ -644,21 +581,17 @@ void removeList(list* l)
 
 list* getTail(list* l)
 {
-	if (!l)
-		return NULL;
+	if (!l) return NULL;
  	list *top = l;
-	while (top->next)
-		top = top->next;
+	while (top->next) top = top->next;
 	return top;
 }
 
 int scoreForOwner(Owner owner)
 {
 	int score = 0;
-	for (int i = 0; i < HEIGHT; ++i)
-	{
-		for (int j = 0; j < WIDTH; ++j)
-		{
+	for (int i = 0; i < HEIGHT; ++i) {
+		for (int j = 0; j < WIDTH; ++j) {
 			if (board[HEIGHT * i + j].owner == owner)
 				score++;
 		}
@@ -668,10 +601,8 @@ int scoreForOwner(Owner owner)
 
 Field findNextMove(Owner owner)
 {
-	if (gameMode == MODE_PC)
-	{
-		switch (gameTactic)
-		{
+	if (gameMode == MODE_PC) {
+		switch (gameTactic) {
 			case T_WORST:
 				return findWorstMove(owner);
 			case T_FIRST:
@@ -696,16 +627,12 @@ Field findBestMove(Owner owner)
 	int numFlipped = 0;
 	int numPrevFlipped = 0;
 
-	for (int i = 0; i < HEIGHT; ++i)
-	{
-		for (int j = 0; j < WIDTH; ++j)
-		{
+	for (int i = 0; i < HEIGHT; ++i) {
+		for (int j = 0; j < WIDTH; ++j) {
 			if (board[HEIGHT * i + j].owner != NONE)
 				continue;
-			if ((numFlipped = canFlipLines(board[HEIGHT * i + j])))
-			{
-				if (numFlipped > numPrevFlipped)
-				{
+			if ((numFlipped = canFlipLines(board[HEIGHT * i + j]))) {
+				if (numFlipped > numPrevFlipped) {
 					result = board[HEIGHT * i + j];
 					numPrevFlipped = numFlipped;
 				}
@@ -728,16 +655,12 @@ Field findWorstMove(Owner owner)
 	int numFlipped = 0;
 	int numPrevFlipped = WIDTH * HEIGHT;
 
-	for (int i = 0; i < HEIGHT; ++i)
-	{
-		for (int j = 0; j < WIDTH; ++j)
-		{
-			if (board[HEIGHT * i + j].owner != NONE)
+	for (int i = 0; i < HEIGHT; ++i) {
+		for (int j = 0; j < WIDTH; ++j) {
+			if (board[HEIGHT * i + j].owner != NONE) 
 				continue;
-			if ((numFlipped = canFlipLines(board[HEIGHT * i + j])))
-			{
-				if (numFlipped < numPrevFlipped)
-				{
+			if ((numFlipped = canFlipLines(board[HEIGHT * i + j]))) {
+				if (numFlipped < numPrevFlipped) {
 					result = board[HEIGHT * i + j];
 					numPrevFlipped = numFlipped;
 				}
@@ -755,25 +678,18 @@ Field findRandomMove(Owner owner)
 	Field result;
 	result.X = -1;
 
-	if (emptyFieldsCount)
-	{
+	if (emptyFieldsCount) {
 		srand(time(NULL)); // initialize random seed
 
-		Field *emptyFields = 
-			(Field*)malloc(sizeof(Field) * emptyFieldsCount);
+		Field *emptyFields = (Field*)malloc(sizeof(Field) * emptyFieldsCount);
 		unsigned short curFieldPos = 0;
 
 		// copy empty and valid for flipping 
 		// fields in a new array
-		for (int i = 0; i < HEIGHT; ++i)
-		{
-			for (int j = 0; j < WIDTH; ++j)
-			{
-				if (board[HEIGHT * i + j].owner == NONE && 
-						canFlipLines(board[HEIGHT * i + j]))
-				{
-					emptyFields[curFieldPos] = 
-						board[HEIGHT * i + j];
+		for (int i = 0; i < HEIGHT; ++i) {
+			for (int j = 0; j < WIDTH; ++j) {
+				if (board[HEIGHT * i + j].owner == NONE && canFlipLines(board[HEIGHT * i + j])) {
+					emptyFields[curFieldPos] = board[HEIGHT * i + j];
 					curFieldPos++;
 				}
 			}
@@ -787,13 +703,11 @@ Field findRandomMove(Owner owner)
 		// and set new owner to check
 		currentOwner = owner;
 
-		while (1)
-		{
+		while (1) {
 			// peek next field
 			curFieldPos = rand() % emptyFieldsCount;
 			// check if we can flip any lines with it
-			if (canFlipLines(emptyFields[curFieldPos]))
-			{
+			if (canFlipLines(emptyFields[curFieldPos])) {
 				result = emptyFields[curFieldPos];
 				break;
 			}
@@ -815,14 +729,11 @@ Field findFirstAvailMove(Owner owner)
 	Owner prevOwner = currentOwner;
 	currentOwner = owner;
 
-	for (int i = 0; i < WIDTH; ++i)
-	{
-		for (int j = 0; j < HEIGHT; ++j)
-		{
+	for (int i = 0; i < WIDTH; ++i) {
+		for (int j = 0; j < HEIGHT; ++j) {
 			if (board[HEIGHT * i + j].owner != NONE)
 				continue;
-			if (canFlipLines(board[HEIGHT * i + j]))
-			{
+			if (canFlipLines(board[HEIGHT * i + j])) {
 				result = board[HEIGHT * i + j];
 				currentOwner = prevOwner;
 				return result;
@@ -853,27 +764,21 @@ int canFlipLine(Field field, int dx, int dy)
 	int curY = field.Y + dy;
 	Field* curField = &field;
 
-	if ((curX >= 0 && curY >= 0)
-			&& (curX < WIDTH && curY < HEIGHT))
-	{
+	if ((curX >= 0 && curY >= 0) && (curX < WIDTH && curY < HEIGHT)) {
 		if (board[curY * HEIGHT + curX].owner == currentOwner)
 			return 0;
 	}
 
 	list* l = NULL;
-	while ((curX >= 0 && curY >= 0)
-			&& (curX < WIDTH && curY < HEIGHT))
-	{
+	while ((curX >= 0 && curY >= 0) && (curX < WIDTH && curY < HEIGHT)) {
 		curField = &(board[curY * HEIGHT + curX]);
-		if (curField->owner != NONE)
-		{
+		if (curField->owner != NONE) {
 			list* el = makeElement(curField);
 			if (!l)
 				l = el;
 			else
 				addElement(l, el);
-		}
-		else
+		} else
 			break;
 
 		curX += dx;
@@ -881,18 +786,14 @@ int canFlipLine(Field field, int dx, int dy)
 	}
 
 	list* tail = getTail(l);
-	if (tail)
-	{
+	if (tail) {
 		int startToFlip = 0;
 		int numFlipped = 0;
-		while (tail)
-		{
+		while (tail) {
 			if (!startToFlip && tail->val->owner == currentOwner)
 				startToFlip = 1;
 			if (startToFlip)
-			{
 				numFlipped++;
-			}
 
 			tail = tail->prev;
 		}
@@ -906,11 +807,9 @@ int canFlipLine(Field field, int dx, int dy)
 void restoreState()
 {
 	currentOwner = prevOwner;
-	for (int i = 0; i < HEIGHT; ++i)
-	{
-		for (int j = 0; j < WIDTH; ++j)
-		{
-				board[HEIGHT * i + j] = prevBoard[HEIGHT * i + j];
+	for (int i = 0; i < HEIGHT; ++i) {
+		for (int j = 0; j < WIDTH; ++j) {
+			board[HEIGHT * i + j] = prevBoard[HEIGHT * i + j];
 		}
 	}
 }
@@ -918,11 +817,9 @@ void restoreState()
 void saveState()
 {
 	prevOwner = currentOwner;
-	for (int i = 0; i < HEIGHT; ++i)
-	{
-		for (int j = 0; j < WIDTH; ++j)
-		{
-				prevBoard[HEIGHT * i + j] = board[HEIGHT * i + j];
+	for (int i = 0; i < HEIGHT; ++i) {
+		for (int j = 0; j < WIDTH; ++j) {
+			prevBoard[HEIGHT * i + j] = board[HEIGHT * i + j];
 		}
 	}
 }
@@ -963,8 +860,7 @@ void cleanup()
 TTF_Font* makeFont(const char* fileName, const unsigned int size)
 {
 	TTF_Font *newFont = TTF_OpenFont(fileName, size);
-	if(!newFont)
-	{
+	if(!newFont) {
 		printf("TTF_OpenFont: %s\n", TTF_GetError());
 	}
 	return newFont;
@@ -972,11 +868,9 @@ TTF_Font* makeFont(const char* fileName, const unsigned int size)
 
 void newGame()
 {
-	for (int i = 0; i < HEIGHT; ++i)
-	{
-		for (int j = 0; j < WIDTH; ++j)
-		{
-				board[HEIGHT * i + j].owner = NONE;
+	for (int i = 0; i < HEIGHT; ++i) {
+		for (int j = 0; j < WIDTH; ++j) {
+			board[HEIGHT * i + j].owner = NONE;
 		}
 	}
 	setInitialFields();
@@ -1007,5 +901,5 @@ void print_usage(char **argv)
 			"\t\tdefault mode - PC always choose best move)\n"
 			"\nThis is CS50\t2013\n",
 			argv[0]
-			);
+		  );
 }
