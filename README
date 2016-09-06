@@ -1,9 +1,0 @@
-Dependencies:
-	libsdl
-	libsdl-ttf
-	libsdl-image
-
-Keys:
-	Q - quit program
-	B - undo last move
-
