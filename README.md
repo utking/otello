@@ -1,5 +1,7 @@
 # Otello
 
+Otello, a game written in C. Uses SDL library for UI part. Can be compiled and run on Linux/Windows.
+
 ## Dependencies
 
 * libsdl
