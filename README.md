@@ -1,17 +1,27 @@
-#### Dependencies:
+# Otello
 
-- libsdl
-- libsdl-ttf
-- libsdl-image
+## Dependencies
 
-#### Install
+* libsdl
+* libsdl-ttf
+* libsdl-image
 
-`make`
+## Build
 
-#### Keys:
+```sh
+$ make
+```
 
-- Q - quit program
-- B - undo last move
+## Usage
+
+```sh
+$ ./otello
+```
+
+## Keyboard Keys:
+
+* Q - quit program
+* B - undo last move
 
 
 
