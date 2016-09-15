@@ -1,10 +1,10 @@
 CC 			= gcc
-CFLAGS 		= -std=c99 -ggdb `pkg-config --cflags --libs sdl` -lSDL_image -lSDL_ttf -Wall -Werror
+CFLAGS 	= -std=c89 -ggdb `pkg-config --cflags --libs sdl` -lSDL_image -lSDL_ttf -Wall -Werror -pedantic
 OBJS 		= *.o
-TARGET 		= otello
-CLEAN 		= rm -rf
+TARGET 	= otello
+CLEAN 	= rm -rf
 OBJS 		= main.o otello.o
-SOURCES 	= main.c otello.c
+SOURCES	= main.c otello.c
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)

@@ -45,52 +45,52 @@ SDL_Surface* textSurface;
 SDL_Surface* whiteScoreSurface;
 SDL_Surface* blackScoreSurface;
 
-// Score font and text
+/* Score font and text */
 TTF_Font *font;
 SDL_Color fontColor;
 SDL_Rect textDestRect;
 SDL_Rect whiteScoreRect;
 SDL_Rect blackScoreRect;
 
-// Score image rect
+/* Score image rect */
 SDL_Rect scoreSrcRect;
 
-// Game over rect
+/* Game over rect */
 SDL_Rect gameOverSrcRect;
 SDL_Rect gameOverDestRect;
 
-// On mode switcher rect
+/* On mode switcher rect */
 SDL_Rect swOnModeSrcRect;
 SDL_Rect swOnModeDestRect;
 
-// Off mode switcher rect
+/* Off mode switcher rect */
 SDL_Rect swOffModeSrcRect;
 SDL_Rect swOffModeDestRect;
 
-// Human mode rect
+/* Human mode rect */
 SDL_Rect humanModeSrcRect;
 SDL_Rect humanModeDestRect;
 
-// PC mode rect
+/* PC mode rect */
 SDL_Rect pcModeSrcRect;
 SDL_Rect pcModeDestRect;
 
-// Exit button rect
+/* Exit button rect */
 SDL_Rect exitSrcRect;
 SDL_Rect exitDestRect;
 
-// 'Current' text rect
+/* 'Current' text rect */
 SDL_Rect currentSrcRect;
 SDL_Rect currentDestRect;
 
-// Current owner on panel rect
+/* Current owner on panel rect */
 SDL_Rect curOwnerDestRect;
 
-// New game button rect
+/* New game button rect */
 SDL_Rect newSrcRect;
 SDL_Rect newDestRect;
 
-// CS50 text rect
+/* CS50 text rect */
 SDL_Rect cs50SrcRect;
 SDL_Rect cs50DestRect;
 
@@ -115,11 +115,11 @@ Field* createBoard();
 
 void destroyBoard(Field *board);
 
-// Set field with checks
+/* Set field with checks */
 int setField(Field* board, 
 		int X, int Y, 
 		Owner owner);
-// Set field without checks
+/* Set field without checks */
 void putField(Field* board, 
 		int X, int Y, 
 		Owner owner);
@@ -154,7 +154,7 @@ void print_usage(char **argv);
 void cleanup();
 TTF_Font* makeFont(const char* fileName, const unsigned int size);
 
-// ------- SDL routines ----
+/* ------- SDL routines ---- */
 
 int onEvent(SDL_Event *event, Field* board);
 void onRender(const Field* board);
@@ -167,9 +167,9 @@ SDL_Surface* loadTextSurface();
 void drawItem(SDL_Surface* srcSurf, SDL_Surface* destSurf, 
 		int X, int Y);
 
-//--------------------------
+/* -------------------------- */
 
-// linked list rutines
+/* linked list rutines */
 
 typedef struct list
 {
@@ -182,7 +182,5 @@ list* makeElement(Field* val);
 void addElement(list* l, list* el);
 void removeList(list* l);
 list* getTail(list* l);
-
-//
 
 #endif
