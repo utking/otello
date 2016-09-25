@@ -921,11 +921,11 @@ void print_usage(char **argv)
 			"\tFlags:\n"
 			"\t-h -- print this help and exit\n"
 			"\t-f -- fullscreen mode (windowed mode by default)\n"
-			"\t-m arg -- game mode ('c' for PC opponent, "
+			"\t-m [c|m] -- game mode ('c' for PC opponent, "
 			"'h' - for human)\n"
-			"\t-t arg -- game tactic ('w' - PC always choose worts move,\n"
-			"\t\t'r' - PC always choose random move, "
-			"\t\t'f' - PC always choose first available move, "
+			"\t-t [w|r|f] -- game tactics ('w' - PC always choose worst move,\n"
+			"\t\t'r' - PC always choose random move,\n"
+			"\t\t'f' - PC always choose first available move,\n"
 			"\t\tdefault mode - PC always choose best move)\n"
 			"\nThis is CS50\t2013\n",
 			argv[0]
