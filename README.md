@@ -4,6 +4,7 @@ Otello, a game written in C. Uses SDL library for UI part. Can be compiled and r
 
 ## Dependencies
 
+* CMake as a building environment
 * libsdl
 * libsdl-ttf
 * libsdl-image
@@ -11,7 +12,7 @@ Otello, a game written in C. Uses SDL library for UI part. Can be compiled and r
 ## Build
 
 ```sh
-$ make
+$ cmake . && make
 ```
 
 ## Usage
